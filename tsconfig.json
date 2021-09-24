@@ -1,0 +1,36 @@
+  {
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "types": ["cypress", "@4tw/cypress-drag-drop"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ]
+  },
+
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  },
+
+    "include": ["src/**/*"],
+    "exclude": [
+      "typings/browser.d.ts",
+      "typings/browser",
+      "node_modules",
+      "node_modules/cypress"
+  ]
+}

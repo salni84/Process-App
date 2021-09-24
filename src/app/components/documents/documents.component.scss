@@ -1,0 +1,64 @@
+.doc-title {
+  background-color: black;
+  height: 80px;
+  align-items: center;
+  text-align: center;
+  display: flex;
+  font-family: "Century Gothic", sans-serif;
+}
+
+.otherDocuments {
+  background-color: black;
+  height: 30px;
+  text-align: center;
+  display: flex;
+  font-family: "Century Gothic", sans-serif;
+  padding-left: 10%;
+}
+
+.next {
+  margin-right: 20px;
+  color: white;
+}
+
+.main {
+  display: flow-root;
+  width: -webkit-fill-available;
+}
+
+.arrow {
+  margin-left: 20em;
+}
+
+.addProcess {
+  margin-top: 5%;
+}
+
+.container {
+  margin-top: 50px;
+  margin-left: 10em;
+  display: block;
+  width: 1100px;
+}
+
+table {
+  width: 100%;
+  background-color: white;
+  border-style: solid;
+}
+
+mat-table {
+  width: 150px;
+}
+
+.deleteBox {
+  cursor: pointer;
+}
+
+.addButton {
+  min-width: 40px;
+  line-height: 25px;
+  text-align: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}

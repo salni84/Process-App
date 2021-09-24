@@ -1,0 +1,27 @@
+.content {
+  grid-area: content;
+  width: 200%;
+  height: 3000px;
+  background-image: url(~src/assets/images/background5.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.header {
+  grid-area: header;
+  margin-bottom: 70px;
+}
+
+.navleft {
+  grid-area: navleft;
+}
+
+.footer {
+  grid-area: footer;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 130px auto;
+  grid-template-areas: 'header header' 'navleft content' 'footer footer';
+}
