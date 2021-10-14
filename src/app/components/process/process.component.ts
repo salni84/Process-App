@@ -8,6 +8,11 @@ import {Location} from '@angular/common';
 import {DocumentService} from '../../../service/document.service';
 import {Document} from '../../model/document';
 import {LegendService} from '../../../service/legend-service';
+import {select, State, Store} from '@ngrx/store';
+import {Observable} from 'rxjs';
+import {getProcess} from '../../store/selectors/process.selector';
+import {isLoggedIn} from '../../store/selectors/login.selector';
+
 
 
 @Component({
@@ -18,7 +23,7 @@ import {LegendService} from '../../../service/legend-service';
 export class ProcessComponent implements OnInit {
 
   @Input() newProcess: ProcessElement;
-  detailProcessList: ProcessElement[] = [];
+  detailProcessList: any = [];
   level = 1;
   uuid: number;
   parent: number;
@@ -26,39 +31,37 @@ export class ProcessComponent implements OnInit {
   hideCreateElement: boolean[] = [false, false, false, false, false, false, false, false];
   showAddButton: boolean[] = [true, true, true, true, true, true, true, true];
   isAdmin = false;
-  firstProcessRow: ProcessElement[] = [];
-  secondProcessRow: ProcessElement[] = [];
-  thirdProcessRow: ProcessElement[] = [];
-  fourthProcessRow: ProcessElement[] = [];
-  fifthProcessRow: ProcessElement[] = [];
-  sixthProcessRow: ProcessElement[] = [];
-  seventhProcessRow: ProcessElement[] = [];
-  eighthProcessRow: ProcessElement[] = [];
   matchDocs: Document[] = [];
   matchNames: string[] = [];
   departments: any = [];
+  loginStatus$: Observable<any>;
+  processList$: Observable<ProcessElement[]>;
 
 
   constructor(private location: Location,
+              private store: Store<{login: boolean}>,
+              private store1: Store<{process: ProcessElement[]}>,
+              private processStore: Store<any>,
               private processService: ProcessService,
               private route: ActivatedRoute,
               private loginService: LoginService,
               private documentService: DocumentService,
               private legend: LegendService) {
+    this.loginStatus$ = store.select(isLoggedIn);
+    this.processList$ = store1.select(getProcess);
+    this.store.dispatch({ type: '[Process] loadAllProcess' });
   }
 
 
   ngOnInit() {
-    this.loginService.getLoginStatus().subscribe((data) => {
-    //  if (data) {
-        this.isAdmin = true;
-     /* } else {
-        this.isAdmin = false;
-        this.hideAllAddProcessComponent();
-      }*/
+    this.loginStatus$.subscribe((loginStatus) => {
+     if (loginStatus) {
+       this.isAdmin = true;
+     } else {
+       this.hideAllAddProcessComponent();
+       this.isAdmin = false;
+     }
     });
-  //  this.parentId = this.route.snapshot.paramMap.get('detail');
-    this.getAllProcess();
     this.getDepartments();
   }
 
@@ -81,59 +84,19 @@ export class ProcessComponent implements OnInit {
   }
 
   getAllProcess(parent?: number, uuid?: number, increase?: number) {
-
     this.uuid = uuid;
     if (increase) {
       this.level = this.level + increase;
       localStorage.setItem('parent', uuid?.toString());
-      console.log(uuid)
+      console.log(uuid);
     }
     if (parent === undefined) {
       uuid = this.parent;
     }
-
-    this.clearProcessRows();
-    console.log(uuid)
-    this.processService.getProcess(uuid)
-      .subscribe((process) => {
-        this.distributeProcessElements(process);
-      });
   }
 
-  distributeProcessElements(process) {
-    this.clearProcessRows();
-    this.detailProcessList = process;
-    this.detailProcessList.forEach((data) => {
 
-      if (data.verticalorder === 1) {
-        this.firstProcessRow.push(data);
-      }
-      if (data.verticalorder === 2) {
-        this.secondProcessRow.push(data);
-      }
-      if (data.verticalorder === 3) {
-        this.showDocuments(data);
-        this.thirdProcessRow.push(data);
-      }
-      if (data.verticalorder === 4) {
-        this.fourthProcessRow.push(data);
-      }
-      if (data.verticalorder === 5) {
-        this.fifthProcessRow.push(data);
-      }
-      if (data.verticalorder === 6) {
-        this.sixthProcessRow.push(data);
-      }
-      if (data.verticalorder === 7) {
-        this.seventhProcessRow.push(data);
-      }
-      if (data.verticalorder === 8) {
-        this.eighthProcessRow.push(data);
-      }
-    });
-  }
-
-  drop1(event: CdkDragDrop<string[]>) {
+/*  drop1(event: CdkDragDrop<string[]>) {
     if (this.isAdmin) {
       moveItemInArray(this.firstProcessRow, event.previousIndex, event.currentIndex);
       for (let x = 0; x < this.firstProcessRow.length; x++) {
@@ -211,28 +174,25 @@ export class ProcessComponent implements OnInit {
       }
       this.udpateProcess();
     }
-  }
+  }*/
 
 
   addNewProcess(newProcess: ProcessElement) {
     this.processService.addProcessElement(newProcess)
       .subscribe(process => {
-        this.distributeProcessElements(process);
+       // this.distributeProcessElements(process);
       });
     this.detailProcessList.push(newProcess);
   }
 
-  udpateProcess() {
-    this.processService.updateProcessList(this.detailProcessList, 'detail')
-      .subscribe(() => {
-         this.getAllProcess();
-      });
+  udpateProcess(processElement: ProcessElement) {
+    this.store.dispatch({ type: '[Process] updateProcess', payload: processElement });
   }
 
   deleteProcessElement(id: number) {
     this.processService.deleteProcess(id)
       .subscribe(process => {
-        this.distributeProcessElements(process);
+        //this.distributeProcessElements(process);
       });
   }
 
@@ -258,24 +218,14 @@ export class ProcessComponent implements OnInit {
       });*/
   }
 
-  clearProcessRows() {
-    this.firstProcessRow = [];
-    this.secondProcessRow = [];
-    this.thirdProcessRow = [];
-    this.fourthProcessRow = [];
-    this.fifthProcessRow = [];
-    this.sixthProcessRow = [];
-    this.seventhProcessRow = [];
-    this.eighthProcessRow = [];
-  }
+
 
   navigateBack() {
     const parent = localStorage.getItem('parent');
     // tslint:disable-next-line:radix
     const convertedNumber = parseInt(parent);
-    console.log(convertedNumber)
+    console.log(convertedNumber);
     this.getAllProcess( convertedNumber);
   }
-
 }
 
