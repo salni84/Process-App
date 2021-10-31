@@ -1,12 +1,32 @@
 <div class="detail-title" xmlns="http://www.w3.org/1999/html">
-  <mat-icon class="arrow" (click)="navigateBack()">fast_rewind</mat-icon>
-  <h2>Detailprozess </h2><h2>{{level}}</h2>
+  <mat-icon class="arrow" (click)="navigateBack()" *ngIf="breadcrumb.length > 0">fast_rewind</mat-icon>
+  <ng-container *ngFor="let p of processName">
+    <h3>{{p}} ></h3>
+  </ng-container>
 </div>
-<app-legend></app-legend>
+
+
 
 <div class="main">
-  <div class="container">
+  <div class="legendBar">
+    <div  class="example-list">
+      <button mat-raised-button class="newLegend" (click)="addNewDepartment()">New</button>
+      <div cdkDropList cdkDropListOrientation="horizontal" class="departmentsArea"  (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let d of departments " cdkDrag>
+          <div class="legend" [ngStyle]="{backgroundColor: d.color}">
+              <div class="departmentBox" >
+                <button class="update" (click)="deleteDepartment(d.id)">X</button>
+                {{   d.departmentname}}
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+
+<div class="processElements">
+  <div class="container" >
     <div class="addProcess" *ngIf="isAdmin">
       <button mat-raised-button class="addButton" *ngIf="showAddButton[0]" (click)="showAddProcessComponent(0)">+
       </button>
@@ -19,34 +39,28 @@
         <app-create-process *ngIf="showCreateElement[0]"
                             (newProcessEvent)="addNewProcess($event)"
                             [level]="level"
+                            [parent]="parent"
+                            [color]="backgroundColorRow1"
                             [order]="1"
                             [uuid]="uuid" ></app-create-process>
 
-
         <div *ngFor="let p of processList$ | async">
-          <div *ngIf="p.verticalorder === 1">
 
+          <div *ngIf="p.verticalorder === 1">
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow1}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <div class="names"><label>{{p.processname}}</label></div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow1}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow1, 'border-bottom-color': backgroundColorRow1}"></div>
           </mat-card>
 
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field  class="form-field" *ngIf="p.visible">
               <input matInput [(ngModel)]="p.processname" type="text" class="name" placeholder="Prozessname" >
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label><mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">{{d.name}}
-                </mat-option>
-              </mat-select>
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -59,15 +73,12 @@
               <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
-
-
         </div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="container">
+  <div class="container" >
     <div class="addProcess" *ngIf="isAdmin">
       <button mat-raised-button class="addButton" *ngIf="showAddButton[1]" (click)="showAddProcessComponent(1)">+
       </button>
@@ -79,35 +90,27 @@
         <app-create-process *ngIf="showCreateElement[1]"
                             (newProcessEvent)="addNewProcess($event)"
                             [level]="level"
+                            [parent]="parent"
                             [order]="2"
+                            [color]="backgroundColorRow2"
                             [uuid]="uuid"
         ></app-create-process>
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 2">
-          <mat-card [class.circle]="p.form" [class.bubble]="p.bubble" [ngStyle]="{backgroundColor: p.color}"
+          <mat-card [class.circle]="p.form" [class.bubble]="p.bubble" [ngStyle]="{backgroundColor: backgroundColorRow2}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow2}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow2, 'border-bottom-color': backgroundColorRow2}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -120,7 +123,7 @@
               </ng-container>
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
           </div>
@@ -132,6 +135,10 @@
 
 
   <div class="container">
+    <ng-container *ngFor="let d of departments">
+      <div class="legend" *ngIf="d.verticalorder === 3 && breadcrumb.length > 0" [ngStyle]="{backgroundColor: backgroundColorRow3}">
+      </div>
+    </ng-container>
     <div class="addProcess" *ngIf="isAdmin">
       <button mat-raised-button class="addButtonCore" *ngIf="showAddButton[2]" (click)="showAddProcessComponent(2)">+
       </button>
@@ -144,39 +151,31 @@
       <app-create-process *ngIf="showCreateElement[2]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
+                          [color]="backgroundColorRow3"
                           [order]="3"
                           [uuid]="uuid"
       ></app-create-process>
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 3">
-          <mat-card [routerLink]="p.name" [class.circle]="p.form" [class.bubble]="p.bubble"
+          <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
                     [class.disableLink]="p.form && !isAdmin"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow3}"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <p class="doc-icon" *ngIf="p.hasDocument">
               <mat-icon>attach_file</mat-icon>
             </p>
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow3}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow3, 'border-bottom-color': backgroundColorRow3}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -190,7 +189,7 @@
               <button [class.greyedOut]="p.hasDocument" mat-raised-button class="editButton"
                       (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
         </div>
@@ -210,6 +209,8 @@
       <app-create-process *ngIf="showCreateElement[3]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
+                          [color]="backgroundColorRow4"
                           [order]="4"
                           [uuid]="uuid"
       ></app-create-process>
@@ -217,30 +218,20 @@
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 4">
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow4}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow4}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow4, 'border-bottom-color': backgroundColorRow4}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -254,7 +245,7 @@
 
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
           </div>
@@ -274,6 +265,8 @@
       <app-create-process *ngIf="showCreateElement[4]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
+                          [color]="backgroundColorRow5"
                           [order]="5"
                           [uuid]="uuid"
       ></app-create-process>
@@ -281,29 +274,19 @@
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 5">
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow5}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag>
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow5}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow5, 'border-bottom-color': backgroundColorRow5}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -316,7 +299,7 @@
               </ng-container>
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
         </div>
@@ -336,6 +319,8 @@
       <app-create-process *ngIf="showCreateElement[5]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
+                          [color]="backgroundColorRow6"
                           [order]="6"
                           [uuid]="uuid"
       ></app-create-process>
@@ -343,30 +328,20 @@
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 6" >
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow6}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow6}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow6, 'border-bottom-color': backgroundColorRow6}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -379,7 +354,7 @@
               </ng-container>
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
           </div>
@@ -399,36 +374,28 @@
       <app-create-process *ngIf="showCreateElement[6]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
                           [order]="7"
+                          [color]="backgroundColorRow7"
                           [uuid]="uuid"
       ></app-create-process>
       <div cdkDropList cdkDropListOrientation="horizontal" class="detail-process" (cdkDropListDropped)="drop7($event)">
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 7">
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow7}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag>
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow7}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow7, 'border-bottom-color': backgroundColorRow7}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -441,7 +408,7 @@
               </ng-container>
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
           </div>
@@ -461,6 +428,8 @@
       <app-create-process *ngIf="showCreateElement[7]"
                           (newProcessEvent)="addNewProcess($event)"
                           [level]="level"
+                          [parent]="parent"
+                          [color]="backgroundColorRow8"
                           [order]="8"
                           [uuid]="uuid"
       ></app-create-process>
@@ -468,30 +437,20 @@
         <div *ngFor="let p of processList$ | async ">
           <div *ngIf="p.verticalorder === 8">
           <mat-card [class.circle]="p.form" [class.bubble]="p.bubble"
-                    [ngStyle]="{backgroundColor: p.color}"
+                    [ngStyle]="{backgroundColor: backgroundColorRow8}"
                     [class.disableLink]="p.form && !isAdmin"
                     [class.isInvisible]="!p.visible" cdkDrag
-                    (click)="getAllProcess(p.parent, p.uuid, 1)">
+                    (click)="getChildProcess(p.processname, p.parent, p.uuid)">
             <div class="names">
-              <label>{{p.visiblename}}</label>
-              <label class="connection" *ngIf="isAdmin">{{p.name}}</label>
+              <label>{{p.processname}}</label>
             </div>
-            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': p.color}"></div>
+            <div class="mat-card-after" *ngIf="p.form == 0" [ngStyle]="{'border-left-color': backgroundColorRow8}"></div>
             <div class="mat-card-before" *ngIf="p.form == 0"
-                 [ngStyle]="{'border-top-color': p.color, 'border-bottom-color': p.color}"></div>
+                 [ngStyle]="{'border-top-color': backgroundColorRow8, 'border-bottom-color': backgroundColorRow8}"></div>
           </mat-card>
           <div class="saveAndUpdate" *ngIf="isAdmin">
             <mat-form-field class="form-field" *ngIf="p.visible">
-              <input matInput type="text" class="name" [(ngModel)]="p.name" placeholder="Prozessname">
-            </mat-form-field>
-            <mat-form-field appearance="fill" *ngIf="p.visible">
-              <mat-label>Abteilung</mat-label>
-              <mat-select [(ngModel)]="p.color">
-                <mat-option class="options" *ngFor="let d of departments" [value]="d.color"
-                            [ngStyle]="{backgroundColor: d.color}">
-                  {{d.name}}
-                </mat-option>
-              </mat-select>
+              <input matInput type="text" class="name" [(ngModel)]="p.processname" placeholder="Prozessname">
             </mat-form-field>
             <div class="buttons">
               <ng-container *ngIf="p.visible">
@@ -504,12 +463,15 @@
               </ng-container>
               <button mat-raised-button class="editButton" (click)="deleteProcessElement(p.id)">Löschen
               </button>
-              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess()">Update</button>
+              <button *ngIf="p.visible" mat-raised-button class="editButton" (click)="udpateProcess(p)">Update</button>
             </div>
           </div>
         </div>
       </div>
       </div>
     </div>
+    <div>
+  </div>
   </div>
 </div>
+

@@ -3,7 +3,11 @@ import {Action} from '@ngrx/store';
 export enum ActionTypes {
   loadAllProcess = '[Process] loadAllProcess',
   processLoaded = '[Process] processLoaded',
-  updateProcess = '[Process] updateProcess'
+  updateProcess = '[Process] updateProcess',
+  deleteProcess = '[Process] deleteProcess',
+  addNewProcess = '[Process] addNewProcess',
+  updateProcessOrder = '[Process] updateProcessOrder',
+  getBasicProcess = '[Process] getBasicprocess',
 }
 
 export class LoadAllProcess implements Action {
@@ -22,7 +26,37 @@ export class UpdateProcess implements Action {
   readonly type = ActionTypes.updateProcess;
   constructor(public payload) {
   }
-
 }
 
-export type ProcessActions = LoadAllProcess |ProcessLoaded | UpdateProcess;
+export class UpdateProcessOrder implements Action {
+  readonly type = ActionTypes.updateProcess;
+  constructor(public payload) {
+  }
+}
+
+export class DeleteProcess implements Action {
+  readonly type = ActionTypes.deleteProcess;
+  constructor(public payload, public parent) {
+  }
+}
+
+export class AddNewProcess implements Action {
+  readonly type = ActionTypes.addNewProcess;
+  constructor(public payload, public parent) {
+  }
+}
+
+export class GetBasicProcess implements Action {
+  readonly type = ActionTypes.getBasicProcess;
+  constructor(public payload) {
+  }
+}
+
+export type ProcessActions =
+  LoadAllProcess |
+  ProcessLoaded |
+  UpdateProcess |
+  DeleteProcess |
+  AddNewProcess |
+  UpdateProcessOrder |
+  GetBasicProcess;
